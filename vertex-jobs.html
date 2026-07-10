@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vertex — Find your next angle</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#12162B;
+    --surface:#1B2140;
+    --surface-2:#232B52;
+    --accent:#FF8A3D;
+    --accent-2:#5EEAD4;
+    --text:#F2F0E9;
+    --muted:#8B90B3;
+    --line: rgba(242,240,233,0.10);
+  }
+
+  *{ box-sizing:border-box; }
+
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    overflow-x:hidden;
+  }
+
+  h1,h2,h3,.display-font{
+    font-family:'Space Grotesk', sans-serif;
+  }
+
+  .mono{
+    font-family:'JetBrains Mono', monospace;
+  }
+
+  a{ color:var(--accent-2); }
+  ::selection{ background:var(--accent); color:#12162B; }
+
+  :focus-visible{
+    outline: 2px solid var(--accent-2);
+    outline-offset: 3px;
+  }
+
+  /* ---------- NAV ---------- */
+  .navbar-vertex{
+    background: rgba(18,22,43,0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand-cube{
+    width:22px; height:22px;
+    position:relative;
+    perspective: 100px;
+    margin-right:10px;
+  }
+  .brand-cube .face{
+    position:absolute; inset:0;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    opacity:0.85;
+    animation: cube-spin 7s linear infinite;
+    border-radius:3px;
+  }
+  @keyframes cube-spin{
+    0%{ transform: rotate(0deg) scale(1); }
+    50%{ transform: rotate(180deg) scale(0.7); border-radius:50%; }
+    100%{ transform: rotate(360deg) scale(1); }
+  }
+  .navbar-brand{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    letter-spacing:0.04em;
+    color:var(--text) !important;
+    display:flex;
+    align-items:center;
+  }
+  .nav-link{ color:var(--muted) !important; font-size:0.92rem; }
+  .nav-link:hover{ color:var(--text) !important; }
+  .btn-accent{
+    background:var(--accent);
+    color:#1a1204;
+    font-weight:600;
+    border:none;
+  }
+  .btn-accent:hover{ background:#ffa15e; color:#1a1204; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding: 5.5rem 0 4rem;
+    background:
+      radial-gradient(ellipse at 20% -10%, rgba(94,234,212,0.12), transparent 55%),
+      radial-gradient(ellipse at 90% 0%, rgba(255,138,61,0.14), transparent 50%),
+      var(--bg);
+    overflow:hidden;
+  }
+  .hero-dotgrid{
+    position:absolute; inset:0;
+    background-image: radial-gradient(rgba(242,240,233,0.07) 1px, transparent 1px);
+    background-size: 26px 26px;
+    mask-image: radial-gradient(ellipse at 60% 30%, black 10%, transparent 70%);
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    letter-spacing:0.14em;
+    color:var(--accent-2);
+    text-transform:uppercase;
+  }
+  .hero h1{
+    font-size: clamp(2.3rem, 5vw, 3.8rem);
+    font-weight:700;
+    line-height:1.05;
+    max-width: 620px;
+  }
+  .hero h1 em{
+    font-style:normal;
+    color:var(--accent);
+  }
+  .hero p.lead{
+    color:var(--muted);
+    max-width:480px;
+    font-size:1.05rem;
+  }
+  .hero-stats{
+    display:flex; gap:2rem; margin-top:2rem;
+  }
+  .hero-stats .stat-num{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:1.6rem; font-weight:700; color:var(--text);
+  }
+  .hero-stats .stat-label{
+    color:var(--muted); font-size:0.78rem; letter-spacing:0.03em;
+  }
+
+  /* ---------- VERTEX STACK (signature 3D hero element) ---------- */
+  .vertex-stack-wrap{
+    perspective: 1400px;
+    height: 420px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .vertex-stack{
+    position:relative;
+    width: 280px; height: 340px;
+    transform-style: preserve-3d;
+    transition: transform 0.15s ease-out;
+    transform: rotateX(10deg) rotateY(-18deg);
+  }
+  .vstack-card{
+    position:absolute;
+    inset:0;
+    border-radius:16px;
+    border:1px solid var(--line);
+    padding: 1.3rem;
+    background: linear-gradient(155deg, var(--surface-2), var(--surface));
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6);
+    transform-style: preserve-3d;
+  }
+  .vstack-card .vc-tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.68rem;
+    color:var(--accent-2);
+    letter-spacing:0.08em;
+  }
+  .vstack-card h4{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:1.15rem;
+    margin-top:0.6rem;
+  }
+  .vstack-card p{
+    color:var(--muted);
+    font-size:0.85rem;
+    margin-top:0.4rem;
+  }
+  .vstack-card .vc-pill{
+    display:inline-block;
+    font-size:0.7rem;
+    padding:0.2rem 0.6rem;
+    border-radius:20px;
+    background: rgba(255,138,61,0.14);
+    color:var(--accent);
+    margin-top:0.9rem;
+    font-family:'JetBrains Mono', monospace;
+  }
+  .vc-1{ transform: translateZ(0px) translateY(0px); z-index:3; }
+  .vc-2{ transform: translateZ(-46px) translateY(-26px) translateX(34px); z-index:2; opacity:0.9; }
+  .vc-3{ transform: translateZ(-92px) translateY(-52px) translateX(68px); z-index:1; opacity:0.65; }
+
+  @media (max-width: 991px){
+    .vertex-stack-wrap{ height: 300px; margin-top:2rem; }
+    .vertex-stack{ width:220px; height:270px; transform: rotateX(8deg) rotateY(-14deg) scale(0.9); }
+  }
+
+  /* ---------- SEARCH BAR ---------- */
+  .search-panel{
+    background: var(--surface);
+    border:1px solid var(--line);
+    border-radius: 14px;
+    padding: 1.1rem;
+    margin-top: -2.6rem;
+    position:relative;
+    z-index:5;
+    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.55);
+  }
+  .form-control, .form-select{
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--text);
+  }
+  .form-control::placeholder{ color: var(--muted); }
+  .form-control:focus, .form-select:focus{
+    background: var(--surface-2);
+    color: var(--text);
+    border-color: var(--accent-2);
+    box-shadow: 0 0 0 0.2rem rgba(94,234,212,0.15);
+  }
+  .form-select option{ background: var(--surface-2); color:var(--text); }
+
+  /* ---------- SECTION HEADERS ---------- */
+  .section-pad{ padding: 3.5rem 0; }
+  .section-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    margin-bottom: 1.6rem; flex-wrap:wrap; gap:0.6rem;
+  }
+  .section-head h2{ font-size:1.7rem; font-weight:700; }
+  .result-count{ color:var(--muted); font-family:'JetBrains Mono', monospace; font-size:0.85rem; }
+
+  /* ---------- JOB CARDS (tilt-on-hover) ---------- */
+  .job-col{ perspective: 1000px; }
+  .job-card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 1.4rem;
+    height:100%;
+    cursor:pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    will-change: transform;
+    position:relative;
+  }
+  .job-card:hover, .job-card:focus-visible{
+    border-color: rgba(94,234,212,0.35);
+    box-shadow: 0 25px 45px -20px rgba(0,0,0,0.55);
+  }
+  .job-card .jc-inner{
+    transform: translateZ(24px);
+    transform-style:preserve-3d;
+  }
+  .jc-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:0.6rem; }
+  .jc-logo{
+    width:44px; height:44px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Space Grotesk', sans-serif; font-weight:700;
+    font-size:1.05rem;
+    flex-shrink:0;
+  }
+  .job-card h5{ font-family:'Space Grotesk', sans-serif; font-size:1.08rem; margin:0.7rem 0 0.15rem; }
+  .job-card .jc-company{ color:var(--muted); font-size:0.88rem; }
+  .job-card .jc-meta{ color:var(--muted); font-size:0.78rem; margin-top:0.6rem; font-family:'JetBrains Mono', monospace; }
+  .jc-tags{ margin-top:0.9rem; display:flex; flex-wrap:wrap; gap:0.4rem; }
+  .jc-tag{
+    font-size:0.7rem;
+    padding:0.2rem 0.55rem;
+    border-radius: 20px;
+    background: var(--surface-2);
+    color: var(--muted);
+    border:1px solid var(--line);
+  }
+  .jc-salary{
+    margin-top:1rem;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.85rem;
+    color:var(--accent-2);
+  }
+  .jc-remote-badge{
+    font-size:0.68rem;
+    padding:0.15rem 0.5rem;
+    border-radius:20px;
+    background: rgba(255,138,61,0.16);
+    color: var(--accent);
+    font-family:'JetBrains Mono', monospace;
+    white-space:nowrap;
+  }
+
+  .empty-state{
+    text-align:center; padding: 3rem 1rem; color:var(--muted);
+    border: 1px dashed var(--line); border-radius:14px;
+  }
+
+  /* ---------- MODAL / FLIP CARD ---------- */
+  .modal-content{
+    background: transparent;
+    border:none;
+  }
+  .flip-card{
+    perspective: 1600px;
+    min-height: 480px;
+  }
+  .flip-inner{
+    position:relative;
+    width:100%; min-height:480px;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(.4,.2,.2,1);
+  }
+  .flip-card.flipped .flip-inner{
+    transform: rotateY(180deg);
+  }
+  .flip-face{
+    position:absolute; inset:0;
+    backface-visibility: hidden;
+    background: var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding: 2rem;
+    overflow-y:auto;
+  }
+  .flip-back{
+    transform: rotateY(180deg);
+    display:flex;
+    flex-direction:column;
+  }
+  .btn-close{ filter: invert(1) grayscale(1) brightness(1.7); }
+
+  .success-check{
+    width:76px; height:76px; border-radius:50%;
+    background: rgba(94,234,212,0.14);
+    display:flex; align-items:center; justify-content:center;
+    margin: 0 auto 1.2rem;
+    animation: pop-in 0.5s ease;
+  }
+  @keyframes pop-in{
+    0%{ transform: scale(0.3) rotateY(90deg); opacity:0; }
+    100%{ transform: scale(1) rotateY(0deg); opacity:1; }
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    border-top:1px solid var(--line);
+    padding: 2.2rem 0;
+    color: var(--muted);
+    font-size:0.85rem;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.001s !important; transition-duration: 0.15s !important; }
+    .vertex-stack{ transform: rotateX(6deg) rotateY(-10deg) !important; }
+    .job-card{ transform:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="navbar navbar-vertex navbar-expand-lg fixed-top py-3">
+  <div class="container">
+    <a class="navbar-brand" href="#top">
+      <span class="brand-cube"><span class="face"></span></span>VERTEX
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav1" style="border-color:var(--line);">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav1">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+        <li class="nav-item"><a class="nav-link" href="#roles">Roles</a></li>
+        <li class="nav-item"><a class="nav-link" href="#how">How it works</a></li>
+        <li class="nav-item"><button class="btn btn-accent btn-sm px-3 mt-2 mt-lg-0" onclick="document.getElementById('roles').scrollIntoView({behavior:'smooth'})">Browse jobs</button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div id="top"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-dotgrid"></div>
+  <div class="container position-relative">
+    <div class="row align-items-center g-4 pt-5">
+      <div class="col-lg-6">
+        <div class="eyebrow mb-3">Coordinates for your career</div>
+        <h1>Find your next <em>angle.</em></h1>
+        <p class="lead mt-3">Vertex maps open roles the way you actually evaluate them — by team, by tradeoffs, by where the work points next. Tilt a card, see what's underneath.</p>
+        <div class="hero-stats">
+          <div>
+            <div class="stat-num" id="statJobs">0</div>
+            <div class="stat-label">open roles</div>
+          </div>
+          <div>
+            <div class="stat-num" id="statCompanies">0</div>
+            <div class="stat-label">hiring teams</div>
+          </div>
+          <div>
+            <div class="stat-num">24h</div>
+            <div class="stat-label">avg. reply time</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="vertex-stack-wrap" id="vstackWrap">
+          <div class="vertex-stack" id="vstack">
+            <div class="vstack-card vc-3">
+              <div class="vc-tag">// SENIOR</div>
+              <h4>Platform Engineer</h4>
+              <p>Nimbus Cloud — Remote</p>
+              <span class="vc-pill">$150k–190k</span>
+            </div>
+            <div class="vstack-card vc-2">
+              <div class="vc-tag">// LEAD</div>
+              <h4>Product Designer</h4>
+              <p>Fable Studio — Austin, TX</p>
+              <span class="vc-pill">$120k–150k</span>
+            </div>
+            <div class="vstack-card vc-1">
+              <div class="vc-tag">// STAFF</div>
+              <h4>Data Scientist</h4>
+              <p>Lumen Analytics — Remote</p>
+              <span class="vc-pill">$135k–165k</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEARCH -->
+<div class="container">
+  <div class="search-panel">
+    <div class="row g-2">
+      <div class="col-md-5">
+        <input type="text" class="form-control" id="searchInput" placeholder="Search role, company, or keyword">
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" id="locationFilter">
+          <option value="">Any location</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" id="typeFilter">
+          <option value="">Any type</option>
+        </select>
+      </div>
+      <div class="col-md-1 d-grid">
+        <button class="btn btn-accent" id="clearBtn" title="Clear filters">Clear</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JOB LISTINGS -->
+<section class="section-pad" id="roles">
+  <div class="container">
+    <div class="section-head">
+      <h2>Open roles</h2>
+      <span class="result-count" id="resultCount">— roles</span>
+    </div>
+    <div class="row g-4" id="jobGrid"></div>
+    <div class="empty-state d-none" id="emptyState">
+      <h5 class="display-font">No roles match those coordinates</h5>
+      <p class="mb-0">Try widening your search or clearing filters.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section-pad" id="how" style="background:var(--surface); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="eyebrow mb-2">Step one</div>
+        <h3 class="h5">Pick your angle</h3>
+        <p class="text-muted-vertex" style="color:var(--muted)">Filter by location, type, and keyword until the stack matches what you're actually looking for.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="eyebrow mb-2">Step two</div>
+        <h3 class="h5">Flip the card</h3>
+        <p style="color:var(--muted)">Open any role to see the full brief — team, stack, compensation — no redirects.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="eyebrow mb-2">Step three</div>
+        <h3 class="h5">Apply in place</h3>
+        <p style="color:var(--muted)">Submit directly from the card. One form, one confirmation, done.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container d-flex flex-wrap justify-content-between gap-2">
+    <span>© 2026 Vertex Jobs. Built with Bootstrap, CSS 3D and a bit of parallax.</span>
+    <span class="mono">v1.0</span>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal fade" id="jobModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="flip-card" id="flipCard">
+        <div class="flip-inner" id="flipInner">
+
+          <!-- FRONT: details -->
+          <div class="flip-face flip-front">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <div class="eyebrow mono" id="mTag">// ROLE</div>
+                <h3 class="display-font mt-1 mb-0" id="mTitle">Title</h3>
+                <div style="color:var(--muted)" id="mCompanyLoc">Company — Location</div>
+              </div>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mb-3" id="mTags"></div>
+
+            <div class="mono mb-3" id="mSalary" style="color:var(--accent-2)"></div>
+
+            <p id="mDesc" style="color:var(--text); opacity:0.9;"></p>
+
+            <div class="mt-4">
+              <h6 class="mono" style="color:var(--muted); letter-spacing:0.06em;">WHAT YOU'LL NEED</h6>
+              <ul id="mReqs" style="color:var(--muted)"></ul>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4 pt-3" style="border-top:1px solid var(--line)">
+              <span class="mono" style="color:var(--muted); font-size:0.8rem;" id="mPosted"></span>
+              <button class="btn btn-accent px-4" id="applyBtn">Apply now</button>
+            </div>
+          </div>
+
+          <!-- BACK: application form -->
+          <div class="flip-face flip-back">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <div class="eyebrow mono">// APPLICATION</div>
+                <h3 class="display-font mt-1" id="mTitleBack">Apply</h3>
+              </div>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div id="applyFormWrap">
+              <form id="applyForm">
+                <div class="mb-3">
+                  <label class="form-label mono" style="font-size:0.8rem; color:var(--muted);">Full name</label>
+                  <input required type="text" class="form-control" id="appName" placeholder="Jordan Ellis">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label mono" style="font-size:0.8rem; color:var(--muted);">Email</label>
+                  <input required type="email" class="form-control" id="appEmail" placeholder="you@email.com">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label mono" style="font-size:0.8rem; color:var(--muted);">Why this role?</label>
+                  <textarea class="form-control" id="appNote" rows="3" placeholder="A couple sentences on fit — optional."></textarea>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                  <button type="button" class="btn btn-outline-light btn-sm" id="backBtn" style="border-color:var(--line); color:var(--muted);">← Back to role</button>
+                  <button type="submit" class="btn btn-accent px-4">Submit application</button>
+                </div>
+              </form>
+            </div>
+
+            <div id="applySuccess" class="d-none text-center my-auto py-4">
+              <div class="success-check">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#5EEAD4" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 6L9 17l-5-5"></path>
+                </svg>
+              </div>
+              <h4 class="display-font">Application sent</h4>
+              <p style="color:var(--muted)">We've flagged <span id="successName">you</span> for <strong id="successRole">this role</strong>. Expect a reply within a day.</p>
+              <button class="btn btn-accent mt-2 px-4" data-bs-dismiss="modal">Done</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // ---------------- DATA ----------------
+  const JOBS = [
+    { id:1, title:"Platform Engineer", company:"Nimbus Cloud", location:"Remote", type:"Full-time", level:"Senior", salary:"$150k–190k", posted:"2d ago",
+      tags:["Kubernetes","Go","Infra"], initials:"NC", color:"#5EEAD4",
+      desc:"Own the reliability of the services that route traffic for 40,000 customers. You'll design the next generation of our autoscaling layer and mentor two engineers on the infra team.",
+      reqs:["6+ years building distributed systems","Deep comfort with Kubernetes and Go","Experience owning production on-call"] },
+    { id:2, title:"Product Designer", company:"Fable Studio", location:"Austin, TX", type:"Full-time", level:"Lead", salary:"$120k–150k", posted:"1d ago",
+      tags:["Figma","Design systems","0→1"], initials:"FS", color:"#FF8A3D",
+      desc:"Lead design for a new storytelling tool used by independent game studios. You'll shape the design system from scratch and pair closely with the founding engineer.",
+      reqs:["Portfolio showing systems thinking, not just polish","Experience shipping 0→1 products","Comfortable presenting directly to founders"] },
+    { id:3, title:"Data Scientist", company:"Lumen Analytics", location:"Remote", type:"Full-time", level:"Staff", salary:"$135k–165k", posted:"3d ago",
+      tags:["Python","ML","Forecasting"], initials:"LA", color:"#5EEAD4",
+      desc:"Build the forecasting models that power inventory decisions for retail partners. You'll work at the boundary of research and production, shipping models that actually run.",
+      reqs:["Strong applied ML background","Experience productionizing models, not just notebooks","SQL fluency"] },
+    { id:4, title:"Frontend Engineer", company:"Hollow & Co", location:"New York, NY", type:"Full-time", level:"Mid", salary:"$110k–135k", posted:"5d ago",
+      tags:["React","Animation","Bootstrap"], initials:"HC", color:"#FF8A3D",
+      desc:"Build the customer-facing dashboard used by our merchant partners, with a strong focus on motion and micro-interaction quality.",
+      reqs:["3+ years with React or similar","An eye for interaction detail","Comfortable owning a feature end-to-end"] },
+    { id:5, title:"DevOps Contractor", company:"Nimbus Cloud", location:"Remote", type:"Contract", level:"Senior", salary:"$90/hr", posted:"6d ago",
+      tags:["Terraform","AWS","CI/CD"], initials:"NC", color:"#5EEAD4",
+      desc:"3-month engagement to rebuild our CI/CD pipeline and migrate infrastructure-as-code to Terraform across three environments.",
+      reqs:["Proven Terraform + AWS experience","Available 30+ hrs/week","Can start within 2 weeks"] },
+    { id:6, title:"UX Researcher", company:"Fable Studio", location:"Austin, TX", type:"Part-time", level:"Mid", salary:"$60k–75k (0.6 FTE)", posted:"1w ago",
+      tags:["Research","Interviews","Synthesis"], initials:"FS", color:"#FF8A3D",
+      desc:"Run a lightweight but rigorous research practice for a 12-person studio — recruiting, interviewing, and synthesizing insight for design and product.",
+      reqs:["Experience running qualitative studies solo","Comfortable working part-time and async","Strong written synthesis"] },
+    { id:7, title:"Engineering Manager", company:"Lumen Analytics", location:"Remote", type:"Full-time", level:"Lead", salary:"$170k–200k", posted:"4d ago",
+      tags:["Leadership","ML platform"], initials:"LA", color:"#5EEAD4",
+      desc:"Lead a team of 6 engineers building the internal ML platform. You'll balance hands-on architecture input with growing a still-small team.",
+      reqs:["2+ years managing engineers","Background as an IC on ML or data infra","Comfortable in ambiguity"] },
+    { id:8, title:"Support Engineer", company:"Hollow & Co", location:"Remote", type:"Full-time", level:"Junior", salary:"$70k–85k", posted:"3d ago",
+      tags:["Customer-facing","Debugging"], initials:"HC", color:"#FF8A3D",
+      desc:"Be the first line of technical support for our merchant partners, triaging bugs and escalating the right issues to engineering.",
+      reqs:["1+ years in a technical support role","Clear written communication","Basic SQL and JS debugging skills"] },
+  ];
+
+  let activeFilters = { q:"", location:"", type:"" };
+  let currentJob = null;
+
+  // ---------------- RENDER ----------------
+  function populateFilterOptions(){
+    const locSel = document.getElementById('locationFilter');
+    const typeSel = document.getElementById('typeFilter');
+    const locs = [...new Set(JOBS.map(j=>j.location))].sort();
+    const types = [...new Set(JOBS.map(j=>j.type))].sort();
+    locs.forEach(l=>{
+      const o = document.createElement('option'); o.value=l; o.textContent=l; locSel.appendChild(o);
+    });
+    types.forEach(t=>{
+      const o = document.createElement('option'); o.value=t; o.textContent=t; typeSel.appendChild(o);
+    });
+  }
+
+  function jobCardHTML(job){
+    const initialsColor = job.color;
+    return `
+      <div class="col-md-6 col-lg-4 job-col">
+        <div class="job-card" tabindex="0" role="button" data-id="${job.id}" aria-label="View ${job.title} at ${job.company}">
+          <div class="jc-inner">
+            <div class="jc-top">
+              <div class="jc-logo" style="background:${initialsColor}22; color:${initialsColor};">${job.initials}</div>
+              <span class="jc-remote-badge">${job.type}</span>
+            </div>
+            <h5>${job.title}</h5>
+            <div class="jc-company">${job.company}</div>
+            <div class="jc-meta">${job.location} · ${job.level}</div>
+            <div class="jc-tags">
+              ${job.tags.map(t=>`<span class="jc-tag">${t}</span>`).join('')}
+            </div>
+            <div class="jc-salary">${job.salary}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderJobs(){
+    const grid = document.getElementById('jobGrid');
+    const empty = document.getElementById('emptyState');
+    const q = activeFilters.q.trim().toLowerCase();
+
+    const filtered = JOBS.filter(j=>{
+      const matchesQ = !q || (j.title+j.company+j.tags.join(' ')).toLowerCase().includes(q);
+      const matchesLoc = !activeFilters.location || j.location === activeFilters.location;
+      const matchesType = !activeFilters.type || j.type === activeFilters.type;
+      return matchesQ && matchesLoc && matchesType;
+    });
+
+    grid.innerHTML = filtered.map(jobCardHTML).join('');
+    document.getElementById('resultCount').textContent = `${filtered.length} role${filtered.length===1?'':'s'}`;
+    empty.classList.toggle('d-none', filtered.length !== 0);
+
+    attachTilt();
+    attachCardClicks();
+  }
+
+  function attachCardClicks(){
+    document.querySelectorAll('.job-card').forEach(card=>{
+      card.addEventListener('click', ()=> openJob(parseInt(card.dataset.id)));
+      card.addEventListener('keypress', (e)=>{
+        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openJob(parseInt(card.dataset.id)); }
+      });
+    });
+  }
+
+  // ---------------- TILT EFFECT ----------------
+  const canHover = window.matchMedia('(hover: hover)').matches;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function attachTilt(){
+    if(!canHover || reducedMotion) return;
+    document.querySelectorAll('.job-card').forEach(card=>{
+      card.addEventListener('mousemove', (e)=>{
+        const r = card.getBoundingClientRect();
+        const x = e.clientX - r.left;
+        const y = e.clientY - r.top;
+        const rotateY = ((x / r.width) - 0.5) * 14;
+        const rotateX = ((y / r.height) - 0.5) * -14;
+        card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+      });
+      card.addEventListener('mouseleave', ()=>{
+        card.style.transform = 'rotateX(0deg) rotateY(0deg) translateY(0px)';
+      });
+    });
+  }
+
+  // Hero vertex-stack parallax
+  if(canHover && !reducedMotion){
+    const wrap = document.getElementById('vstackWrap');
+    const stack = document.getElementById('vstack');
+    wrap.addEventListener('mousemove', (e)=>{
+      const r = wrap.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      stack.style.transform = `rotateX(${10 - y*16}deg) rotateY(${-18 + x*20}deg)`;
+    });
+    wrap.addEventListener('mouseleave', ()=>{
+      stack.style.transform = 'rotateX(10deg) rotateY(-18deg)';
+    });
+  }
+
+  // ---------------- MODAL / FLIP LOGIC ----------------
+  const jobModalEl = document.getElementById('jobModal');
+  const jobModal = new bootstrap.Modal(jobModalEl);
+  const flipCard = document.getElementById('flipCard');
+
+  function openJob(id){
+    currentJob = JOBS.find(j=>j.id === id);
+    if(!currentJob) return;
+
+    document.getElementById('mTag').textContent = `// ${currentJob.level.toUpperCase()}`;
+    document.getElementById('mTitle').textContent = currentJob.title;
+    document.getElementById('mTitleBack').textContent = `Apply — ${currentJob.title}`;
+    document.getElementById('mCompanyLoc').textContent = `${currentJob.company} — ${currentJob.location}`;
+    document.getElementById('mSalary').textContent = currentJob.salary + ` · ${currentJob.type}`;
+    document.getElementById('mDesc').textContent = currentJob.desc;
+    document.getElementById('mPosted').textContent = `Posted ${currentJob.posted}`;
+    document.getElementById('mTags').innerHTML = currentJob.tags.map(t=>`<span class="jc-tag">${t}</span>`).join('');
+    document.getElementById('mReqs').innerHTML = currentJob.reqs.map(r=>`<li>${r}</li>`).join('');
+
+    // reset flip / form state
+    flipCard.classList.remove('flipped');
+    document.getElementById('applyForm').reset();
+    document.getElementById('applyForm').classList.remove('d-none');
+    document.getElementById('applyFormWrap').classList.remove('d-none');
+    document.getElementById('applySuccess').classList.add('d-none');
+
+    jobModal.show();
+  }
+
+  document.getElementById('applyBtn').addEventListener('click', ()=>{
+    flipCard.classList.add('flipped');
+  });
+  document.getElementById('backBtn').addEventListener('click', ()=>{
+    flipCard.classList.remove('flipped');
+  });
+
+  document.getElementById('applyForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const name = document.getElementById('appName').value.trim() || 'you';
+    document.getElementById('successName').textContent = name;
+    document.getElementById('successRole').textContent = currentJob ? currentJob.title : 'this role';
+    document.getElementById('applyFormWrap').classList.add('d-none');
+    document.getElementById('applySuccess').classList.remove('d-none');
+  });
+
+  // ---------------- FILTER EVENTS ----------------
+  document.getElementById('searchInput').addEventListener('input', (e)=>{
+    activeFilters.q = e.target.value;
+    renderJobs();
+  });
+  document.getElementById('locationFilter').addEventListener('change', (e)=>{
+    activeFilters.location = e.target.value;
+    renderJobs();
+  });
+  document.getElementById('typeFilter').addEventListener('change', (e)=>{
+    activeFilters.type = e.target.value;
+    renderJobs();
+  });
+  document.getElementById('clearBtn').addEventListener('click', ()=>{
+    activeFilters = { q:"", location:"", type:"" };
+    document.getElementById('searchInput').value = "";
+    document.getElementById('locationFilter').value = "";
+    document.getElementById('typeFilter').value = "";
+    renderJobs();
+  });
+
+  // ---------------- INIT ----------------
+  function animateStat(el, target){
+    let cur = 0;
+    const step = Math.max(1, Math.round(target/24));
+    const iv = setInterval(()=>{
+      cur += step;
+      if(cur >= target){ cur = target; clearInterval(iv); }
+      el.textContent = cur;
+    }, 30);
+  }
+
+  populateFilterOptions();
+  renderJobs();
+  animateStat(document.getElementById('statJobs'), JOBS.length);
+  animateStat(document.getElementById('statCompanies'), new Set(JOBS.map(j=>j.company)).size);
+</script>
+</body>
+</html>
