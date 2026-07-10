@@ -10,7 +10,7 @@ Small playground to test calls to OpenAI from JavaScript Frontend
 ## How to use
 Its hosted using github pages here
 
-https://ckn060497.github.io/Testjobsite/
+https://ckn060497.github.io/Testjobsite/vertex-jobs.html
 
 Follow the link and all steps of using it are explained there.
 
